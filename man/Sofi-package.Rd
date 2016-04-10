@@ -11,11 +11,11 @@ Este paquete tiene  la finalidad de ayudar a aprender diversos temas académicos
 \tabular{ll}{
 Package: \tab Sofi\cr
 Type: \tab Package\cr
-Version: \tab 0.0.26\cr
-Date: \tab 2015-06-22\cr
+Version: \tab 0.16.4.8\cr
+Date: \tab 2016-04-08\cr
 License: \tab GPL (>= 2)\cr
 }
-Se pretende alcanzar una gran variedad de temas desde probabilidad, estadística, física, etc. Para más detalles ver los ejemplos que se describirán abajo o visitar \href{http://www.inegi.info/sofi}{Sofi}
+Se pretende alcanzar una gran variedad de temas desde probabilidad, estadística, física, etc. Para más detalles ver los ejemplos que se describirán abajo o visitar \href{http://www.sofi.uno/}{Sofi}
 }
 \author{
 José D. Loera <jose.loera@inegi.org.mx>
@@ -31,6 +31,7 @@ José D. Loera <jose.loera@inegi.org.mx>
 +  \tab Del repositorio \href{https://github.com/daattali/ggExtra/tree/master/inst/examples/ggMarginal}{ggMarginal} de el autor 
 \href{https://github.com/daattali}{Dean Attali}\cr
 }
+Para más información visitar \href{http://www.sofi.uno/}{http://www.sofi.uno/}
 }
 \keyword{package}
 \keyword{Registros}
@@ -65,6 +66,11 @@ if (interactive()) {
   Defunciones()
 }
 
+# RANDU: el caso de los malos RNG
+if (interactive()) {
+  Estadistica7()
+}
+
 # Aquí vemos como usar la función DefCap, ejemplo general.
 Capis<-c("P456","C682","M613","F629","X392")
 DefCap(Capis)
@@ -75,4 +81,6 @@ InfCap
 
 # Cuando ya tenemos el tamaño de la muestra usamos la función así.
 Etapa01(IDm=DatCap[,1], CausaD=DatCap[,2], n=InfCap$n)
+
+#
 }

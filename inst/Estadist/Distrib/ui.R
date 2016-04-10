@@ -17,6 +17,7 @@ shinyUI(fluidPage(#theme=shinytheme("united"),
 				uiOutput("dist1"),
 				uiOutput("dist2"),
 				uiOutput("dist3")
+				
 			),
 			wellPanel(
 				uiOutput("sampDens"),
@@ -24,7 +25,9 @@ shinyUI(fluidPage(#theme=shinytheme("united"),
 				fluidRow(
 					column(6, downloadButton("dlCurPlot", "Descargar Gráfico", class="btn-block btn-primary")),
 					column(6, downloadButton("dldat", "Descargar Muestra", class="btn-block btn-warning"))
-				)
+				),
+				br(),
+				actionButton("sal", "Salir")
 			)
 		),
 		column(8,

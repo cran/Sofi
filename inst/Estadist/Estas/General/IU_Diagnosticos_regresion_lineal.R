@@ -25,10 +25,12 @@ pageWithSidebar(
              a(href="http://es.wikipedia.org/wiki/Regresi%C3%B3n_lineal", target="_blank", "esto,"),
              " Y recuerda visitar la página de", a(href="http://www.inegi.info/sofi", target="_blank", "Sofi.")),
     br(),
-    helpText(a(href="https://duke.qualtrics.com/SE/?SID=SV_3L8WjmwQo32cVk9", target="_blank", "Rate this app!")),
-    helpText(a(href="https://github.com/ShinyEd/ShinyEd/tree/master/slr_diag", target="_blank", "View code")),
-    helpText(a(href="http://stat.duke.edu/~mc301/shiny/applets.html", target="_blank", "Check out other apps")),
-    helpText(a(href="https://www.coursera.org/course/statistics", target="_blank", "Want to learn more for free?"))),
+    helpText(a(href="https://github.com/ShinyEd/ShinyEd/tree/master/CLT_mean", target="_blank", "Ver código")),
+    helpText(a(href="http://stat.duke.edu/~mc301/shiny/applets.html", target="_blank", "Echa un vistazo a otras aplicaciones")),
+    helpText(a(href="https://www.coursera.org/course/statistics", target="_blank", "¿Quieres saber más de forma gratuita?")),
+    br(),
+    actionButton("sal2", "Salir")
+    ),
   
   
   

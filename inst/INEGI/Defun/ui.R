@@ -1,450 +1,147 @@
 #library(shiny)
-#library(shinythemes)
+library(shinythemes)
 options(shiny.deprecation.messages=FALSE)
-shinyUI(navbarPage("Defunciones",#theme = shinytheme("readable"),
+shinyUI(navbarPage("Defunciones",theme = shinytheme("cerulean"),
 ####_____________________________________________________________
 #___________________________Etapa 1______________________________
 ####________________________________________________________________                   
-tabPanel("Etapa 1",icon = icon("random"),
-  sidebarLayout(
-    source(system.file("INEGI/Defun/General/IU_Etapa1_Sidebar.R", package="Sofi"),local=T)$value,
-    mainPanel(
-    source(system.file("INEGI/Defun/General/IU_Etapa1_MainPanel.R", package="Sofi"),local=T)$value
-              )
-  )
+tabPanel("Muestra",icon = icon("random"),
+    #source(system.file("INEGI/Defun/General/IU_Etapa1.R", package="Sofi"),local=T,encoding="UTF-8")$value
+    #source(system.file("INEGI/Defun/General/IU_Etapa1.R", package="Sofi"),local=T)$value
+    source('./General/IU_Etapa1.R',local=T,encoding="UTF-8")$value
 ),
 ####_____________________________________________________________
-#___________________________Etapa 2 y 3______________________________
+#___________________________Etapa 2______________________________
 ####________________________________________________________________
-tabPanel("Etapa 2 y 3",
-         #fluidPage(
-         sidebarLayout(
-           sidebarPanel(
-             conditionalPanel(
-               'input.Etap02 === "Datos"',
-               fileInput('Etapa2file1', 'Archivo de códigos (en dbf)',
-                         accept=c('.dbf')),
-               helpText('Elegir las variables a utilizar'),
-               uiOutput("Etap2CausaA"),
-               uiOutput("Etap2Causa1"),
-               uiOutput("Etap2Causa2"),
-               tags$hr()
-               
-             ),
-####
-             conditionalPanel(
-               'input.Etap02 === "Revisión"',
-###
-                helpText('Presionar evaluar para iniciar el proceso de obtención de casos a revisión'),
-               actionButton("E2updat1", "Evaluar"),
-               tags$hr(),
-               h6("Registros para revisión:"),
-               verbatimTextOutput("E2RegRev"),
-               tags$hr(),
-               checkboxInput("E2RevGua","Solo los Registros para revisión",value = T),
-               downloadButton('E2DescarRev', 'Guardar'),
-               tags$hr()
-             ),
-####
-             conditionalPanel(
-               'input.Etap02 === "Tablas"',
-####
-               helpText('Elegir la tabla que decea ver'),
-               tags$hr(),
-               radioButtons("Tab", "Tipo de tabla:",
-                            c("Totales por caso" = "Caso",
-                              "Errores a 3 Dígitos" = "Er3D",
-                              "Errores a 4 Dígitos" = "Er4D",
-                              "Caso 4 Mismo Capítulo" = "C4MC",
-                              "Caso 4 Diferente Capítulo" = "C4DF"
-                              )),
-               conditionalPanel(condition = 'input.Tab === "Caso"',
-                                helpText('Si desea guardar la tabla de totales por caso:'),
-                                downloadButton('E2DescarCaso', 'Guardar'),
-                                tags$hr()
-               ),
-               conditionalPanel(condition = 'input.Tab === "Er3D"',
-                                helpText('Si desea guardar la tabla de Errores a 3 Dígitos:'),
-                                downloadButton('E2DescarEr3D', 'Guardar'),
-                                tags$hr()             
-               ),
-               conditionalPanel(condition = 'input.Tab === "Er4D"',
-                                helpText('Si desea guardar la tabla de Errores a 4 Dígitos:'),
-                                downloadButton('E2DescarEr4D', 'Guardar'),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.Tab === "C4MC"',
-                                numericInput("E2nMis", "Mínimo de Errores:", 1),
-                                helpText('Si desea guardar frecuencias para mismo capítulo:'),
-                                downloadButton('E2DescarC4MC', 'Guardar'),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.Tab === "C4DF"',
-                                numericInput("E2nDif", "Mínimo de Errores:", 1),
-                                helpText('Si desea guardar frecuencias para diferente capítulo:'),
-                                downloadButton('E2DescarC4DF', 'Guardar'),
-                                tags$hr()
-               ),
-               tags$hr()
-             ),
-####
-             conditionalPanel(
-               'input.Etap02 === "Población"',
-####
-               helpText('Se requiere el tamaño total de la población, usar archivo de la Etapa 1 sección Resumen'),
-               fileInput('Etapa2file2', 'Archivo de datos (texto o csv)',
-                         accept=c('text/csv',
-                                  'text/comma-separated-values,text/plain', 
-                                  '.csv')),
-               
-               checkboxInput('header', 'Encabezado', TRUE),
-               radioButtons('sep', 'Separado por:',
-                            c(Coma=',',
-                              Puntoycoma=';',
-                              Tabulador='\t'),
-                            ','),
-               radioButtons('quote', 'Quote',
-                            c(None='',
-                              'Double Quote'='"',
-                              'Single Quote'="'"),
-                            '"'),
-               uiOutput("Etap2Pobla"),
-               tags$hr()
-             ),
-#####
-conditionalPanel(
-  'input.Etap02 === "Limites"',
-#####
-helpText('Intervalos de confianza'),
-actionButton("E2Inter", "Calcular"),
-helpText('Elegir la tabla que decea ver'),
-tags$hr(),
-radioButtons("E2Lim", "Límites o gráficos que desea mostrar:",
-             c("Intervalos de confianza a 3 dígitos" = "IC3D",
-               "Intervalos de confianza a 4 dígitos" = "IC4D",
-               "Gráfico a 3 Dígitos" = "Gr3D",
-               "Gráfico a 4 Dígitos" = "Gr4D"
-             )),
-conditionalPanel(condition = 'input.E2Lim === "IC3D"',
-                 helpText('Guardar intervalos de confianza a 3 dígitos:'),
-                 sliderInput(inputId = "E2ErrorI3",
-                             label = "Valor para Error (alfa):",
-                             min = .01, max = .2, value = .05, step = 0.01),
-                 downloadButton('DescarE2Inter3', 'Guardar'),
-                 tags$hr()
-),
-conditionalPanel(condition = 'input.E2Lim === "IC4D"',
-                 helpText('Guardar intervalos de confianza a 4 dígitos:'),
-                 sliderInput(inputId = "E2ErrorI4",
-                             label = "Valor para Error (alfa):",
-                             min = .01, max = .2, value = .05, step = 0.01),
-                 downloadButton('DescarE2Inter4', 'Guardar'),
-                 tags$hr()             
-),
-conditionalPanel(condition = 'input.E2Lim === "Gr3D"',
-                 helpText('Si desea guardar la Gráfico a 3 Dígitos:'),
-                 uiOutput("Etap2Int3"),
-                 tags$hr()               
-),
-conditionalPanel(condition = 'input.E2Lim === "Gr4D"',
-                 helpText('Si desea guardar la Gráfico a 4 Dígitos:'),
-                 uiOutput("Etap2Int4"),
-                 tags$hr()               
-),
-tags$hr(),
-downloadButton('downloadReportE2', 'Reporte')
-
-)
-             
-           ),
-###
-           mainPanel(
-             tabsetPanel(
-               id = 'Etap02',
-###
-               tabPanel("Datos",    
-                        h4("Tabla de Datos"),
-                        dataTableOutput('Etapa2Tabla1')
-               ),
-               
-               tabPanel("Revisión",
-                        h4("Tabla de Revisión"),
-                        dataTableOutput('Etapa2Tabla2')
-               ),
-               
-               tabPanel("Tablas",
-                        conditionalPanel(condition = 'input.Tab === "Caso"',
-                                         h4("Tabla de Totales por Caso"),
-                                         tableOutput('Etapa2Tabla31')
-                                         #dataTableOutput('Etapa2Tabla34')
-                        ),
-                        conditionalPanel(condition = 'input.Tab === "Er3D"',
-                                         h4("Tabla de Errores a 3 Dígitos"),
-                                         tableOutput('Etapa2Tabla32')
-                        ),
-                        conditionalPanel(condition = 'input.Tab === "Er4D"',
-                                         h4("Tabla de Errores a 4 Dígitos"),
-                                         tableOutput('Etapa2Tabla33')
-                        ),
-                        conditionalPanel(condition = 'input.Tab === "C4MC"',
-                                         h4("Frecuencias para mismo capítulo"),
-                                         tableOutput('Etapa2TablaMis')
-                        ),
-                        conditionalPanel(condition = 'input.Tab === "C4DF"',
-                                         h4("Frecuencias para diferente capítulo"),
-                                         tableOutput('Etapa2TablaDif')
-                        )
-               ),
-               
-               tabPanel("Población",
-                        h4("Tabla para Análisis"),
-                        tableOutput('Etapa2TablaTot')
-               ),
-
-                tabPanel("Limites",
-                         conditionalPanel(condition = 'input.E2Lim === "IC3D"',
-                                          h4("Intervalos de confianza a 3 dígitos"),
-                                          tableOutput('Etapa2Inter3')
-                         ),
-                         conditionalPanel(condition = 'input.E2Lim === "IC4D"',
-                                          h4("Intervalos de confianza a 4 dígitos"),
-                                          tableOutput('Etapa2Inter4')
-                         ),
-                         conditionalPanel(condition = 'input.E2Lim === "Gr3D"',
-                                          h4("Gráfico a 3 Dígitos"),
-                                          plotOutput('E2GI3')
-                         ),
-                         conditionalPanel(condition = 'input.E2Lim === "Gr4D"',
-                                          h4("Gráfico a 4 Dígitos"),
-                                          plotOutput('E2GI4')
-                         )
-                      
-                )#tabPanel("Limites"
-               
-             )#tabsetPanel(id = 'Etap02'
-           )#mainPanel(
-         )#sidebarLayout(
+tabPanel("Revisión",
+    source(system.file("INEGI/Defun/General/IU_Etapa2.R", package="Sofi"), local=T, encoding="UTF-8")$value
 ),#tabPanel("Etapa 2 y 3",
+####_____________________________________________________________
+#___________________________Etapa 3______________________________
+####________________________________________________________________
+tabPanel("Experto",
+#         source(system.file("INEGI/Defun/General/IU_Etapa2.R", package="Sofi"),local=T)$value
+sidebarLayout(
+  
+  sidebarPanel(
+    h5("Códigos sugeridos por el codificador experto."),
+  
+    uiOutput("Et3_Num_reg"),
+    uiOutput("Et3_Causa"),
+    
+    checkboxGroupInput("Cod_Cor", "Radio buttons:",
+                 c("label 1" = "option1",
+                   #"label 2" = "option2",
+                   "label 3" = "option3",
+                   "label 4" = "option4")#,
+                 #selected = ""
+                 ),
+    textInput("Et3_inText",  "Código:", value = ""),
+    
+    actionButton("Bot_RAM", "Guardar"),
+    actionButton("Bot_Ant", "Anterior"),
+    actionButton("Bot_Sig", "Siguiente"),
+    actionButton("Bot_Guar", "Grabar"),
+    
+    h5("COD_SEL:"),
+    verbatimTextOutput("E3COD"),
+    verbatimTextOutput("E3CapTex"),
+    #wellPanel(h5("COD_SEL:"),h2(verbatimTextOutput("E3COD"))),
+    checkboxGroupInput("E3_Cod_Int", "Ver código:",
+                       c("Internet" = "intr",
+                         "Tabla" = "tabl",
+                         "Tabla Códigos" = "tabl_Codi"), inline = TRUE
+                         #"label 3" = "option3",
+                         #"label 4" = "option4"
+                         #,
+                       #selected = ""
+    )
+    
+    
+  ),
+  
+  # Show a plot of the generated distribution
+  mainPanel(
+    fluidPage(
+      fluidRow(
+        column(4,
+               actionButton("E3_sal", "Salir"),align = "center"),
+        column(8,verbatimTextOutput("E3Nul"),align = "center")
+      ),
+               fluidRow(
+                 column(width = 4,verbatimTextOutput("E3DatIde")),
+                 column(width = 4,verbatimTextOutput("E3Folea1")),
+                 column(width = 4,verbatimTextOutput("E3Folea2"))
+                        ),
+               fluidRow(
+                 column(width = 8,h4("Causa de la defunción",align = "center"),
+                        verbatimTextOutput("E3Desc1")),
+                 column(width = 2,h4("Duración",align = "center"),
+                        verbatimTextOutput("E3DURATION1")),
+                 column(width = 2,h4("CIE-10",align = "center"),
+                        verbatimTextOutput("E3t_CoA"))
+               ),
+               fluidRow(
+                 column(width = 8,
+                        verbatimTextOutput("E3Desc2")),
+                 column(width = 2,
+                        verbatimTextOutput("E3DURATION2")),
+                 column(width = 2,
+                        verbatimTextOutput("E3t_CoB"))
+               ),
+               fluidRow(
+                 column(width = 8,
+                        verbatimTextOutput("E3Desc3")),
+                 column(width = 2,
+                        verbatimTextOutput("E3DURATION3")),
+                 column(width = 2,
+                        verbatimTextOutput("E3t_CoC"))
+               ),
+               fluidRow(
+                 column(width = 8,
+                        verbatimTextOutput("E3Desc4")),
+                 column(width = 2,
+                        verbatimTextOutput("E3DURATION4")),
+                 column(width = 2,
+                        verbatimTextOutput("E3t_CoD"))
+               ),
+               fluidRow(
+                 column(width = 8,
+                        verbatimTextOutput("E3Desc5")),
+                 column(width = 2,
+                        verbatimTextOutput("E3DURATION5")),
+                 column(width = 2,
+                        verbatimTextOutput("E3t_CoI")
+                        )
+               )
+      #DT::dataTableOutput("Etapa3Tabla1", width = 900)
+  )#fluidPage
+  
+  ),#mainPanel
+  position = "right"
+),#sidebarLayout
+conditionalPanel("input.E3_Cod_Int == 'intr'",
+                 tags$iframe(src="https://eciemaps.mspsi.es/ecieMaps/browser/index_10_2008.html", width = 1200, height=700)#, width = 1200, height=600
+                 
+                 #tags$iframe(src="https://eciemaps.mspsi.es/ecieMaps/browser/index_10_2008.html", width = 1200, height=600)
+                 #tags$iframe(src=paste0("https://eciemaps.mspsi.es/ecieMaps/browser/index_10_2008.html#search=",verbatimTextOutput("E3Link")), width = 1100, height=600) 
+                 #cat("Text",verbatimTextOutput("E3Link"))
+),
+conditionalPanel("input.E3_Cod_Int == 'tabl'",
+                 dataTableOutput("Etapa3Tabla1")#, width = 900
+),
+conditionalPanel("input.E3_Cod_Int == 'tabl_Codi'",
+                 dataTableOutput("Etapa3Tabla2")#, width = 900
+)
+),#tabPanel("Etapa 2 y 3",
+
 
 ####_____________________________________________________________
 #___________________________Etapa 4 y 5______________________________
 ####________________________________________________________________
-tabPanel("Etapa 4 y 5",
+tabPanel("Final",
          #fluidPage(
-         sidebarLayout(
-           sidebarPanel(
-             conditionalPanel(
-               'input.Etap04 === "Datos"',
-               fileInput('Etapa4file1', 'Archivo de códigos (en dbf)',
-                         accept=c('.dbf')),
-               helpText('Elegir las variables a utilizar'),
-               uiOutput("Etap4CausaA"),
-               uiOutput("Etap4Causa1"),
-               uiOutput("Etap4Causa2"),
-               uiOutput("Etap4CausaF"),
-               helpText('Se requiere el tamaño total de la población, usar archivo de la Etapa 1 sección Resumen'),
-               fileInput('Etapa4file2', 'Archivo de datos (texto o csv)',
-                         accept=c('text/csv',
-                                  'text/comma-separated-values,text/plain', 
-                                  '.csv')),
-               
-               checkboxInput('header', 'Encabezado', TRUE),
-               radioButtons('sep', 'Separado por:',
-                            c(Coma=',',
-                              Puntoycoma=';',
-                              Tabulador='\t'),
-                            ','),
-               radioButtons('quote', 'Quote',
-                            c(None='',
-                              'Double Quote'='"',
-                              'Single Quote'="'"),
-                            '"'),
-               uiOutput("Etap4Pobla"),
-               tags$hr()
-               
-             ),
-             ####
-             conditionalPanel(
-               'input.Etap04 === "Revisión"',
-               ###
-               helpText('Presionar evaluar para iniciar el proceso de obtención de casos a revisión'),
-               actionButton("E4updat1", "Evaluar"),
-               tags$hr(),
-               h6("Registros para revisión:"),
-               verbatimTextOutput("E4RegRev"),
-               tags$hr(),
-               checkboxInput("E4RevGua","Solo los Registros para revisión",value = T),
-               downloadButton('E4DescarRev', 'Guardar'),
-               tags$hr()
-             ),
-             ####
-             conditionalPanel(
-               'input.Etap04 === "Tablas"',
-               ####
-               helpText('Elegir la tabla que decea ver'),
-               tags$hr(),
-               radioButtons("E4Tab", "Tipo de tabla:",
-                            c("Totales por caso" = "Caso",
-                              "Errores a 3 Dígitos" = "Er3D",
-                              "Errores a 4 Dígitos" = "Er4D",
-                              "Caso 4 Mismo Capítulo" = "C4MC",
-                              "Caso 4 Diferente Capítulo" = "C4DF"
-                            )),
-               conditionalPanel(condition = 'input.E4Tab === "Caso"',
-                                helpText('Si desea guardar la tabla de totales por caso:'),
-                                downloadButton('E4DescarCaso', 'Guardar'),
-                                tags$hr()
-               ),
-               conditionalPanel(condition = 'input.E4Tab === "Er3D"',
-                                helpText('Si desea guardar la tabla de Errores a 3 Dígitos:'),
-                                downloadButton('E4DescarEr3D', 'Guardar'),
-                                tags$hr()             
-               ),
-               conditionalPanel(condition = 'input.E4Tab === "Er4D"',
-                                helpText('Si desea guardar la tabla de Errores a 4 Dígitos:'),
-                                downloadButton('E4DescarEr4D', 'Guardar'),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.E4Tab === "C4MC"',
-                                numericInput("E4nMis", "Mínimo de Errores:", 1),
-                                helpText('Si desea guardar frecuencias para mismo capítulo:'),
-                                downloadButton('E4DescarC4MC', 'Guardar'),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.E4Tab === "C4DF"',
-                                numericInput("E4nDif", "Mínimo de Errores:", 1),
-                                helpText('Si desea guardar frecuencias para diferente capítulo:'),
-                                downloadButton('E4DescarC4DF', 'Guardar'),
-                                tags$hr()
-               ),
-               tags$hr()
-             ),
-             ####
-             
-             #####
-             conditionalPanel(
-               'input.Etap04 === "Limites"',
-               #####
-               helpText('Intervalos de confianza'),
-               actionButton("E4Inter", "Calcular"),
-               helpText('Elegir la tabla que decea ver'),
-               tags$hr(),
-               radioButtons("E4Lim", "Límites o gráficos que desea mostrar:",
-                            c("Intervalos de confianza a 3 dígitos" = "IC3D",
-                              "Intervalos de confianza a 4 dígitos" = "IC4D",
-                              "Gráfico a 3 Dígitos" = "Gr3D",
-                              "Gráfico a 4 Dígitos" = "Gr4D",
-                              "Tabla de ponderados a 3 dígitos" = "Ta3D"
-                            )),
-               conditionalPanel(condition = 'input.E4Lim === "IC3D"',
-                                helpText('Guardar intervalos de confianza a 3 dígitos:'),
-                                sliderInput(inputId = "E4ErrorI3",
-                                            label = "Valor para Error (alfa):",
-                                            min = .01, max = .2, value = .05, step = 0.01),
-                                downloadButton('DescarE4Inter3', 'Guardar'),
-                                tags$hr()
-               ),
-               conditionalPanel(condition = 'input.E4Lim === "IC4D"',
-                                helpText('Guardar intervalos de confianza a 4 dígitos:'),
-                                sliderInput(inputId = "E4ErrorI4",
-                                            label = "Valor para Error (alfa):",
-                                            min = .01, max = .2, value = .05, step = 0.01),
-                                downloadButton('DescarE4Inter4', 'Guardar'),
-                                tags$hr()             
-               ),
-               conditionalPanel(condition = 'input.E4Lim === "Gr3D"',
-                                helpText('Si desea guardar la Gráfico a 3 Dígitos:'),
-                                uiOutput("Etap4Int3"),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.E4Lim === "Gr4D"',
-                                helpText('Si desea guardar la Gráfico a 4 Dígitos:'),
-                                uiOutput("Etap4Int4"),
-                                tags$hr()               
-               ),
-               conditionalPanel(condition = 'input.E4Lim === "Ta3D"',
-                                helpText('Si desea guardar la Tabla a 3 Dígitos:'),
-                                #uiOutput("Etap4Int4"),
-                                tags$hr()               
-               ),
-               tags$hr()
-               
-             )
-             
-           ),
-           ###
-           mainPanel(
-             tabsetPanel(
-               id = 'Etap04',
-               ###
-               tabPanel("Datos",    
-                        h4("Tabla de Datos"),
-                        dataTableOutput('Etapa4Tabla1'),
-                        tags$hr(),
-                        tableOutput('Etapa4TablaTot')
-                        
-               ),
-               
-               tabPanel("Revisión",
-                        h4("Tabla de Revisión"),
-                        dataTableOutput('Etapa4Tabla2')
-               ),
-               
-               tabPanel("Tablas",
-                        conditionalPanel(condition = 'input.E4Tab === "Caso"',
-                                         h4("Tabla de Totales por Caso"),
-                                         tableOutput('Etapa4Tabla31')
-                                         #dataTableOutput('Etapa4Tabla34')
-                        ),
-                        conditionalPanel(condition = 'input.E4Tab === "Er3D"',
-                                         h4("Tabla de Errores a 3 Dígitos"),
-                                         tableOutput('Etapa4Tabla32')
-                        ),
-                        conditionalPanel(condition = 'input.E4Tab === "Er4D"',
-                                         h4("Tabla de Errores a 4 Dígitos"),
-                                         tableOutput('Etapa4Tabla33')
-                        ),
-                        conditionalPanel(condition = 'input.E4Tab === "C4MC"',
-                                         h4("Frecuencias para mismo capítulo"),
-                                         tableOutput('Etapa4TablaMis')
-                        ),
-                        conditionalPanel(condition = 'input.E4Tab === "C4DF"',
-                                         h4("Frecuencias para diferente capítulo"),
-                                         tableOutput('Etapa4TablaDif')
-                        )
-               ),
-               
-               
-               
-               tabPanel("Limites",
-                        conditionalPanel(condition = 'input.E4Lim === "IC3D"',
-                                         h4("Intervalos de confianza a 3 dígitos"),
-                                         tableOutput('Etapa4Inter3')
-                        ),
-                        conditionalPanel(condition = 'input.E4Lim === "IC4D"',
-                                         h4("Intervalos de confianza a 4 dígitos"),
-                                         tableOutput('Etapa4Inter4')
-                        ),
-                        conditionalPanel(condition = 'input.E4Lim === "Gr3D"',
-                                         h4("Gráfico a 3 Dígitos"),
-                                         plotOutput('E4GI3')
-                        ),
-                        conditionalPanel(condition = 'input.E4Lim === "Gr4D"',
-                                         h4("Gráfico a 4 Dígitos"),
-                                         plotOutput('E4GI4')
-                        ),
-                        conditionalPanel(condition = 'input.E4Lim === "Ta3D"',
-                                         h4("Tabla de ponderados a 3 dígitos"),
-                                         plotOutput('Etapa4TabPon3')
-                                         #dataTableOutput('Etapa4Prueba')
-                                         
-                        )
-                        
-               )#tabPanel("Limites"
-               
-             )#tabsetPanel(id = 'Etap04'
-           )#mainPanel(
-         )#sidebarLayout(
+    source(system.file("INEGI/Defun/General/IU_Etapa4.R", package="Sofi"),local=T,encoding="UTF-8")$value
 )#tabPanel("Etapa 4 y 5",
 
 ))

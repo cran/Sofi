@@ -1,4 +1,5 @@
 importFrom("sampling", srswor)
-importFrom("shiny", shinyAppDir)#,tabPanel,h4,dataTableOutput,tags,tableOutput)
+importFrom("shiny", shinyAppDir,runApp)#,tabPanel,h4,dataTableOutput,tags,tableOutput)
 importFrom("foreign", read.dbf)
-export(DefCap,Etapa01,Defunciones,Estadistica)
+export(DefCap,Etapa01,Defunciones,Estadistica,Estadistica1,Estadistica2,Estadistica3,Estadistica4,
+       Estadistica5,Estadistica6,Estadistica7)#,SofiWebsite

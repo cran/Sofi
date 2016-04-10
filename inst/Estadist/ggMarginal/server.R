@@ -18,7 +18,8 @@ datasets <- list(
 shinyServer(function(input, output, session) {
   # show/hide the marginal plots settings
   observe({
-    toggle("marginal-settings", TRUE, "slide", 0.3, input$show_marginal)
+    toggle(id = "marginal-settings", anim = TRUE,
+           time = 0.3, condition = input$show_marginal)
   })
   
   output$dataset_select <- renderUI({
@@ -80,26 +81,52 @@ shinyServer(function(input, output, session) {
       geom_point() +
       theme_bw(fontSize())
     
+    # apply axis transformations to ensure marginal plots still work
+    if (input$xtrans == "log") {
+      p <- p + scale_x_log10()
+    } else if (input$xtrans == "reverse") {
+      p <- p + scale_x_reverse()
+    }
+    if (input$ytrans == "log") {
+      p <- p + scale_y_log10()
+    } else if (input$ytrans == "reverse") {
+      p <- p + scale_y_reverse()
+    }
+    
     if (input$show_marginal) {
       p <- ggExtra::ggMarginal(
         p,
         type = input$type,
         margins = input$margins,
         size = size(),
-        marginCol = input$marginCol,
-        marginFill = input$marginFill)
+        col = input$col,
+        fill = input$fill)
     }
     
-    print(p)
+    p
   })
   
   # the code to reproduce the plot
   code <- reactive({
     code <- sprintf(paste0(
       "p <- ggplot(`%s`, aes_string('%s', '%s')) +\n",
-      "  geom_point() + theme_bw(%s)\n\n"),
+      "  geom_point() + theme_bw(%s)"),
       input$dataset, input$x_var, input$y_var, fontSize()
     )
+    
+    if (input$xtrans == "log") {
+      code <- paste0(code, " + scale_x_log10()")
+    } else if (input$xtrans == "reverse") {
+      code <- paste0(code, " + scale_x_reverse()")
+    }
+    if (input$ytrans == "log") {
+      code <- paste0(code, " + scale_y_log10()")
+    } else if (input$ytrans == "reverse") {
+      code <- paste0(code, " + scale_y_reverse()")
+    }
+    
+    code <- paste0(code, "\n\n")
+    
     if (input$show_marginal) {
       code <- paste0(code, sprintf(paste0(
         "ggExtra::ggMarginal(\n",
@@ -107,14 +134,18 @@ shinyServer(function(input, output, session) {
         "  type = '%s',\n",
         "  margins = '%s',\n",
         "  size = %s,\n",
-        "  marginCol = '%s',\n",
-        "  marginFill = '%s'\n",
+        "  col = '%s',\n",
+        "  fill = '%s'\n",
         ")"),
-        input$type, input$margins, size(), input$marginCol,
-        input$marginFill))
+        input$type, input$margins, size(), input$col,
+        input$fill))
     } else {
       code <- paste0(code, "p")
     }
+  })
+  
+  observe({
+    if (input$sal == 1) stopApp()
   })
   
   # hide the loading message

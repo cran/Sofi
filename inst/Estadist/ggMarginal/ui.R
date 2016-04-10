@@ -2,19 +2,19 @@ library(shiny)
 library(shinyjs)
 
 shinyUI(fluidPage(
-  title = "Sofi",
+  title = "Demo of ggExtra::ggMarginal()",
   tags$head(includeCSS(file.path('www', 'style.css'))),   
   useShinyjs(),
   
   fluidRow(id = "title-row",
     column(12,
-      h2("Pruebas para Sofi",
-        a("(link)", href = "http://www.inegi.info/sofi")
+      h1("Demo of",
+         a("ggExtra::ggMarginal()", href = "https://github.com/daattali/ggExtra")
       ),
-      #h4("ggMarginal lets you add marginal plots to ggplot2 (finally!)"),
-      h4(tags$i("El código fuente de esta aplicación esta",
-                a("en GitHub", href = "https://github.com/daattali/ggExtra/tree/master/inst/examples/ggMarginal"),
-                HTML("&bull;"), "por", a("Dean Attali", href = "http://deanattali.com")))
+      h4("ggMarginal lets you add marginal plots to ggplot2 (finally!)"),
+      h4(tags$i("Source code for this app is",
+         a("on GitHub", href = "https://github.com/daattali/ggExtra/tree/master/inst/examples/ggMarginal"),
+         HTML("&bull;"), "by", a("Dean Attali", href = "http://deanattali.com")))
     )
   ),
   
@@ -26,7 +26,8 @@ shinyUI(fluidPage(
       uiOutput("dataset_select"),
       uiOutput("x_var_select"),
       uiOutput("y_var_select"),
-      sliderInput("font_size", "Font size", 0, 50, 15, 1)
+      sliderInput("font_size", "Font size", 0, 50, 15, 1),
+      actionButton("sal", "Salir")
     )),
     
     column(3, wellPanel(
@@ -35,15 +36,23 @@ shinyUI(fluidPage(
       checkboxInput("show_marginal", "Show marginal plots", TRUE),
       
       div(id = "marginal-settings",
-        selectInput("type", NULL, c("density", "histogram")),
+        selectInput("type", NULL, c("density", "histogram", "boxplot")),
         selectInput("margins", "Which margins?", c("both", "x", "y")),
+        conditionalPanel(
+          condition = "input.margins != 'y'",
+          selectInput("xtrans", "X axis transformation", c("none", "log","reverse"))
+        ),
+        conditionalPanel(
+          condition = "input.margins != 'x'",
+          selectInput("ytrans", "Y axis transformation", c("none", "log","reverse"))
+        ),
         sliderInput("size",
                     "Size ratio of main plot:marginal plots",
                     1, 5, 5, 0.5),
-        selectInput("marginCol", "Marginal plot colour", colours(), "black"),
+        shinyjs::colourInput("col", "Marginal plot colour", "red", showColour = "background"),
         conditionalPanel(
-          condition = "input.type == 'histogram'",
-          selectInput("marginFill", "Marginal plot fill colour", colours(), "grey")
+          condition = "input.type != 'density'",
+          shinyjs::colourInput("fill", "Marginal plot fill colour", "orange", showColour = "background")
         )
       )      
     )),

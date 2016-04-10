@@ -508,6 +508,7 @@ output$CLT.descr = source('./Funciones/RenderTextFin.R',local=T,encoding="UTF-8"
   answered <- FALSE # an indicator for whether question has been answered
   
   observe({
+    
     #this observer monitors when input$submit is invalidated
     #and displays the answer
     input$submit
@@ -561,7 +562,8 @@ output$CLT.descr = source('./Funciones/RenderTextFin.R',local=T,encoding="UTF-8"
     #this observer monitors when input$newplot is invalidated
     #or when input$difficulty is invalidated
     #and generates a new plot
-    
+    if (input$sal == 1) stopApp()
+    if (input$sal2 == 1) stopApp()
     #update plot, calculate correlation
     if(input$difficulty=="Fácil"){
       difficulty <- 3

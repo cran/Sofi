@@ -22,7 +22,7 @@ Estadistica(Nivel)
 }
 }
 \details{
-Para más detalles ver los ejemplos que se describirán abajo o visitar \href{http://www.inegi.info/sofi}{Sofi}
+Para más detalles ver los ejemplos que se describirán abajo o visitar \href{http://www.sofi.uno/}{Sofi}
 }
 \value{
 No se tienen valores de salida

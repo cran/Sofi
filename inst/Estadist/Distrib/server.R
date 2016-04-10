@@ -189,5 +189,9 @@ shinyServer(function(input, output, session){
 		save(pageviews,file="pageviews.Rdata")
 		paste("Visits:",pageviews)
 	})
+	
+	observe({
+	  if (input$sal == 1) stopApp()
+	})
 
 })
